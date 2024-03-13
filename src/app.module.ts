@@ -12,7 +12,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     CommonModule,
     AuthModule,
     ConfigModule.forRoot(),
-
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

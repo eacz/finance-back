@@ -10,8 +10,18 @@ export class CreateUserDto {
   email: string;
 
   @IsString()
-  name: string;
+  @MinLength(3)
+  @MaxLength(20)
+  firstName: string;
+
+  @IsString()
+  @MinLength(3)
+  @MaxLength(20)
+  lastName: string;
 
   @IsString()
   password: string;
+
+  @IsString()
+  country: string;
 }

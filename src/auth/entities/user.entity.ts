@@ -1,30 +1,50 @@
-//import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-//import { Document } from 'mongoose';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-//export type UserDocument = User & Document;
+@Entity({ name: 'user' })
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-//@Schema({ timestamps: true })
-//export class User {
-//  @Prop({ type: String, unique: true, required: true })
-//  username: string;
+  @Column({ unique: true })
+  username: string;
 
-//  @Prop({ type: String, unique: true, required: true })
-//  email: string;
+  @Column()
+  firstName: string;
 
-//  @Prop({ type: String, required: true })
-//  name: string;
+  @Column()
+  lastName: string;
 
-//  @Prop({ type: String, required: true })
-//  password: string;
+  @Column({ unique: true })
+  email: string;
 
-//  @Prop({ type: Boolean, default: true })
-//  active: boolean;
+  @Column({ select: false })
+  password: string;
 
-//  @Prop({ type: Date })
-//  createdAt?: Date;
+  @Column('boolean', { default: true })
+  active: boolean;
 
-//  @Prop({ type: Date })
-//  updatedAt?: Date;
-//}
+  @Column()
+  country: string;
 
-//export const userSchema = SchemaFactory.createForClass(User);
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  public createdAt: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
+  public updatedAt: Date;
+
+  //@OneToMany(() => account, (account) => account.user, { onDelete: 'CASCADE', cascade: true })
+  //accounts: Account[]
+}
