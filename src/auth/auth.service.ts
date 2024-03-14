@@ -13,7 +13,7 @@ import { Repository } from 'typeorm';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AuthResponse } from './entities/authResponse';
+import { AuthResponse } from './interfaces/authResponse';
 
 @Injectable()
 export class AuthService {
