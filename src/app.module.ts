@@ -6,6 +6,10 @@ import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './user/user.module';
+import { AccountModule } from './account/account.module';
+import { CurrencyModule } from './currency/currency.module';
+import { TransactionModule } from './transaction/transaction.module';
 import RequestLogMiddleware from './middlewares/requestLog.middleware';
 
 @Module({
@@ -33,6 +37,10 @@ import RequestLogMiddleware from './middlewares/requestLog.middleware';
         };
       },
     }),
+    UserModule,
+    AccountModule,
+    CurrencyModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
