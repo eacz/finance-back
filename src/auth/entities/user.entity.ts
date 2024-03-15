@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { Account } from 'src/account/entities/account.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -32,6 +35,12 @@ export class User {
   @Column()
   country: string;
 
+  @OneToMany(() => Account, (account) => account.user, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  accounts: Account[];
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
@@ -44,7 +53,4 @@ export class User {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   public updatedAt: Date;
-
-  //@OneToMany(() => account, (account) => account.user, { onDelete: 'CASCADE', cascade: true })
-  //accounts: Account[]
 }

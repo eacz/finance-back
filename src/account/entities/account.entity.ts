@@ -3,30 +3,33 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Account } from 'src/account/entities/account.entity';
 
-@Entity({ name: 'currency' })
-export class Currency {
+import { User } from 'src/auth/entities/user.entity';
+import { Currency } from 'src/currency/entities/currency.entity';
+
+@Entity({ name: 'account' })
+export class Account {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ unique: true })
-  code: string;
-
-  @Column({ unique: true })
-  name: string;
 
   @Column('boolean', { default: false })
   primary: boolean;
 
   @Column('float')
-  valueAgainstPrimary: number;
+  funds: number;
 
-  @ManyToOne(() => Account, (account) => account.currency, {})
-  accounts: Account[];
+  @ManyToOne(() => User, (user) => user.accounts, {
+    eager: false,
+    onDelete: 'CASCADE',
+  })
+  user: User;
+
+  @OneToMany(() => Currency, (currency) => currency.accounts, {})
+  currency: Currency;
 
   @CreateDateColumn({
     type: 'timestamp',
