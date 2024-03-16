@@ -39,6 +39,18 @@ export class CurrencyService {
     return currencies;
   }
 
+  async getCurrencyById(id: number): Promise<Currency> {
+    const currency = await this.currencyRepository.findOne({
+      select: ['code', 'id', 'name'],
+      where: { id },
+    });
+
+    if (!currency)
+      throw new NotFoundException(`There is no currency with id ${id}`);
+
+    return currency;
+  }
+
   async updateCurrency(
     currencyId: number,
     updateCurrencyDto: UpdateCurrencyDto,

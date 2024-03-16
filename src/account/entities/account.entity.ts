@@ -22,14 +22,14 @@ export class Account {
   @Column('float')
   funds: number;
 
+  @OneToMany(() => Currency, (currency) => currency.accounts, {})
+  currency: Currency;
+
   @ManyToOne(() => User, (user) => user.accounts, {
     eager: false,
     onDelete: 'CASCADE',
   })
   user: User;
-
-  @OneToMany(() => Currency, (currency) => currency.accounts, {})
-  currency: Currency;
 
   @CreateDateColumn({
     type: 'timestamp',
