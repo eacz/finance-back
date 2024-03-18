@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -22,7 +21,7 @@ export class Account {
   @Column('float')
   funds: number;
 
-  @OneToMany(() => Currency, (currency) => currency.accounts, {})
+  @ManyToOne(() => Currency, (currency) => currency.accounts, {})
   currency: Currency;
 
   @ManyToOne(() => User, (user) => user.accounts, {
