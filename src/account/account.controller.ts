@@ -1,4 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { AccountService } from './account.service';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { CreateAccountDto } from './dto/createAccount.dto';
@@ -13,5 +20,14 @@ export class AccountController {
   @Auth()
   create(@Body() createAccountDto: CreateAccountDto, @getUser() user: User) {
     return this.accountService.create(createAccountDto, user);
+  }
+
+  @Get('/:id')
+  @Auth()
+  getAccountById(
+    @Param('id', ParseIntPipe) id: number,
+    @getUser('id') userId: number,
+  ) {
+    return this.accountService.getAccountById(id, userId);
   }
 }
