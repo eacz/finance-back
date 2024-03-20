@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -9,6 +10,7 @@ import { Repository } from 'typeorm';
 import { Account } from './entities/account.entity';
 import { CurrencyService } from '../currency/currency.service';
 import { User } from 'src/auth/entities/user.entity';
+import { UpdateAccountFundsDto } from './dto/updateAccountFunds.dto';
 
 @Injectable()
 export class AccountService {
@@ -54,5 +56,38 @@ export class AccountService {
     }
 
     return account;
+  }
+
+  async updateAccountFunds(
+    id: number,
+    { action, amount }: UpdateAccountFundsDto,
+    userId: number,
+  ) {
+    const account = await this.accountRepository.findOne({
+      where: { id, user: { id: userId } },
+      select: ['id', 'updatedAt', 'funds'],
+    });
+
+    if (!account) throw new NotFoundException(`There is account with id ${id}`);
+
+    switch (action) {
+      case 'ADD':
+        account.funds = account.funds + amount;
+        break;
+      case 'SUBTRACT':
+        if (account.funds - amount < 0) {
+          throw new BadRequestException(
+            `You don't have enough funds to do this operation`,
+          );
+        }
+        account.funds = account.funds - amount;
+        break;
+      case 'SET':
+        account.funds = amount;
+        break;
+    }
+    await this.accountRepository.save(account);
+
+    return account.funds;
   }
 }
