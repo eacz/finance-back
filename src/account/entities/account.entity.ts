@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -21,7 +22,8 @@ export class Account {
   @Column('float')
   funds: number;
 
-  @ManyToOne(() => Currency, (currency) => currency.accounts, {})
+  @ManyToOne(() => Currency)
+  @JoinColumn({ name: 'currency_id' })
   currency: Currency;
 
   @ManyToOne(() => User, (user) => user.accounts, {

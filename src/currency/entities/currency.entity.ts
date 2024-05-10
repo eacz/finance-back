@@ -2,11 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Account } from 'src/account/entities/account.entity';
 
 @Entity({ name: 'currency' })
 export class Currency {
@@ -24,9 +22,6 @@ export class Currency {
 
   @Column('float')
   valueAgainstPrimary: number;
-
-  @OneToMany(() => Account, (account) => account.currency, {})
-  accounts: Account[];
 
   @CreateDateColumn({
     type: 'timestamp',
