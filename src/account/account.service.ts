@@ -65,7 +65,16 @@ export class AccountService {
   ) {
     const account = await this.accountRepository.findOne({
       where: { id, user: { id: userId } },
-      select: ['id', 'updatedAt', 'funds'],
+      select: {
+        id: true,
+        funds: true,
+        updatedAt: true,
+        currency: {
+          id: true,
+        },
+      },
+
+      relations: ['currency'],
     });
 
     if (!account) throw new NotFoundException(`There is account with id ${id}`);
@@ -88,6 +97,6 @@ export class AccountService {
     }
     await this.accountRepository.save(account);
 
-    return account.funds;
+    return account;
   }
 }

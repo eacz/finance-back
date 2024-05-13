@@ -11,7 +11,7 @@ import {
 import { Account } from 'src/account/entities/account.entity';
 import { Currency } from 'src/currency/entities/currency.entity';
 
-enum TransactionType {
+export enum TransactionType {
   INCOME = 'INCOME',
   OUTCOME = 'OUTCOME',
 }
@@ -27,7 +27,7 @@ export class Transaction {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @Column('float')
@@ -38,14 +38,14 @@ export class Transaction {
     cascade: true,
   })
   @JoinColumn({ name: 'account_id' })
-  account: Account;
+  account: number;
 
   @ManyToOne(() => Currency, {
     onDelete: 'CASCADE',
     cascade: true,
   })
   @JoinColumn({ name: 'currency_id' })
-  currency: Currency;
+  currency: number;
 
   @CreateDateColumn({
     type: 'timestamp',
