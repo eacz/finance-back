@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Transaction } from './entities/transaction.entity';
 import { Repository } from 'typeorm';
 import { AccountService } from '../account/account.service';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class TransactionService {
@@ -50,5 +51,20 @@ export class TransactionService {
     delete transaction.user;
 
     return transaction;
+  }
+
+  async getTransactionByUser(paginationDto: PaginationDto, user: User) {
+    const limit = paginationDto.limit || 100;
+    const offset = paginationDto.offset || 0;
+
+    const transactions = await this.transactionRepository.find({
+      where: { user: { id: user.id } },
+      relations: ['currency'],
+      order: { id: { direction: 'ASC' } },
+      skip: offset,
+      take: limit,
+    });
+
+    return transactions;
   }
 }
