@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -28,6 +29,15 @@ export class TransactionController {
       createTransactionDto,
       user,
     );
+  }
+
+  @Patch('/:id')
+  @Auth()
+  revertTransaction(
+    @Param('id', ParseIntPipe) id: number,
+    @getUser() user: User,
+  ) {
+    return this.transactionService.revertTransaction(user, id);
   }
 
   @Get('/by-user')

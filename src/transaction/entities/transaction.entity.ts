@@ -17,6 +17,11 @@ export enum TransactionType {
   OUTCOME = 'OUTCOME',
 }
 
+export enum OpositeType {
+  INCOME = 'OUTCOME',
+  OUTCOME = 'INCOME',
+}
+
 @Entity({ name: 'transaction' })
 export class Transaction {
   @PrimaryGeneratedColumn()

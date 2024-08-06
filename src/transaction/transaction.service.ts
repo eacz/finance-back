@@ -2,7 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/createTransaction.dto';
 import { User } from 'src/auth/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Transaction } from './entities/transaction.entity';
+import {
+  OpositeType,
+  Transaction,
+  TransactionType,
+} from './entities/transaction.entity';
 import { Repository } from 'typeorm';
 import { AccountService } from '../account/account.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -16,7 +20,7 @@ export class TransactionService {
   ) {}
 
   async createTransaction(
-    createTransactionDto: CreateTransactionDto,
+    createTransactionDto: CreateTransactionDto | Transaction,
     user: User,
   ) {
     const account = await this.accountService.updateAccountFunds(
@@ -84,5 +88,24 @@ export class TransactionService {
       .take(limit)
       .orderBy('id', 'ASC');
     return transactions;
+  }
+
+  async revertTransaction(user: User, id: number) {
+    const transaction = await this.transactionRepository.findOne({
+      where: { user: { id: user.id }, id },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException(`There is no transaction with id ${id}`);
+    }
+
+    const revertedTransaction: Transaction = {
+      ...transaction,
+      type: TransactionType[OpositeType[transaction.type]],
+      title: `Operation reversed Nro #${transaction.id} - ${transaction.title}`,
+    };
+    delete revertedTransaction.id;
+
+    return await this.createTransaction(revertedTransaction, user);
   }
 }
