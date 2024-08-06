@@ -39,6 +39,20 @@ export class TransactionController {
     return this.transactionService.getTransactionByUser(paginationDto, user);
   }
 
+  @Get('/by-account/:accountId')
+  @Auth()
+  getTransactionByAccount(
+    @Param('accountId', ParseIntPipe) accountId: number,
+    @Query() paginationDto: PaginationDto,
+    @getUser() user: User,
+  ) {
+    return this.transactionService.getTransactionByAccount(
+      paginationDto,
+      user,
+      accountId,
+    );
+  }
+
   @Get('/:id')
   @Auth()
   getTransactionById(

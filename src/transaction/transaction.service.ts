@@ -67,4 +67,22 @@ export class TransactionService {
 
     return transactions;
   }
+
+  async getTransactionByAccount(
+    paginationDto: PaginationDto,
+    user: User,
+    accountId: number,
+  ) {
+    const limit = paginationDto.limit || 100;
+    const offset = paginationDto.offset || 0;
+
+    const transactions = this.transactionRepository
+      .createQueryBuilder('transaction')
+      .where('user_id = :userId', { userId: user.id })
+      .andWhere('account_id = :accountId', { accountId })
+      .skip(offset)
+      .take(limit)
+      .orderBy('id', 'ASC');
+    return transactions;
+  }
 }
