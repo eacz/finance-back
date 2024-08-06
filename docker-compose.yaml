@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:14.3
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_PASSWORD: '${PGPASSWORD}'
+      POSTGRES_DB: '${PGDB}'
+    container_name: igdatabase
+    volumes:
+      - psql:/var/lib/postgresql/data
+volumes:
+  psql:
