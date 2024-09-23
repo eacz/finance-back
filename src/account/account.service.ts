@@ -45,6 +45,15 @@ export class AccountService {
     return account;
   }
 
+  async getAccountByUser(userId: number) {
+    const accounts = await this.accountRepository.find({
+      where: { user: { id: userId } },
+      relations: ['currency'],
+    });
+
+    return accounts;
+  }
+
   async getAccountById(id: number, userId: number) {
     const account = await this.accountRepository.findOne({
       where: { id, user: { id: userId } },

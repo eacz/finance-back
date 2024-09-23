@@ -24,6 +24,14 @@ export class AccountController {
     return this.accountService.create(createAccountDto, user);
   }
 
+  @Get('/by-user')
+  @Auth()
+  getAccountByUser(
+    @getUser('id') userId: number,
+  ) {
+    return this.accountService.getAccountByUser(userId);
+  }
+
   @Get('/:id')
   @Auth()
   getAccountById(
