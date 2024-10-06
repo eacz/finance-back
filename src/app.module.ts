@@ -10,6 +10,7 @@ import { UserModule } from './user/user.module';
 import { AccountModule } from './account/account.module';
 import { CurrencyModule } from './currency/currency.module';
 import { TransactionModule } from './transaction/transaction.module';
+import { SeedModule } from './seed/seed.module';
 import RequestLogMiddleware from './middlewares/requestLog.middleware';
 
 @Module({
@@ -41,6 +42,7 @@ import RequestLogMiddleware from './middlewares/requestLog.middleware';
     AccountModule,
     CurrencyModule,
     TransactionModule,
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [AppService],
