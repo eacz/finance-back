@@ -21,7 +21,7 @@ import RequestLogMiddleware from './middlewares/requestLog.middleware';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
-        const isProduction = configService.get('STAGE') === 'dev';
+        const isProduction = configService.get('STAGE') !== 'dev';
         return {
           ssl: isProduction,
           extra: {
