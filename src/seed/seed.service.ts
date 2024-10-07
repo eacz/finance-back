@@ -1,26 +1,48 @@
 import { Injectable } from '@nestjs/common';
-import { users } from './data/users';
+import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import { Repository } from 'typeorm';
+
 import { AuthService } from 'src/auth/auth.service';
-import { UserAuth } from 'src/auth/interfaces/authResponse';
 import { CurrencyService } from 'src/currency/currency.service';
-import { currencies } from './data/currencies';
-import { Currency } from 'src/currency/entities/currency.entity';
 import { AccountService } from 'src/account/account.service';
+import { TransactionService } from 'src/transaction/transaction.service';
+
+import { currencies } from './data/currencies';
+import { users } from './data/users';
+import { getTransactions } from './data/transactions';
+
+import { UserAuth } from 'src/auth/interfaces/authResponse';
+
+import { Currency } from 'src/currency/entities/currency.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { Account } from 'src/account/entities/account.entity';
 
 @Injectable()
 export class SeedService {
   constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Currency)
+    private readonly currencyRepository: Repository<Currency>,
+    @InjectRepository(Account)
+    private readonly accountRepository: Repository<Account>,
     private readonly authService: AuthService,
     private readonly accountService: AccountService,
     private readonly currencyService: CurrencyService,
+    private readonly transactionService: TransactionService,
   ) {}
 
   async generateSeed() {
+    await this.accountRepository.delete({});
+    await this.currencyRepository.delete({});
+    await this.userRepository.delete({});
+
     const users = await this.seedUsers();
     const currencies = await this.seedCurrencies();
     const accounts = await this.seedAccounts(users, currencies);
+    const transactions = await this.seedTransactions(accounts);
+    console.log(transactions);
   }
 
   private async seedUsers() {
@@ -61,5 +83,14 @@ export class SeedService {
     const currenciesCreated = await Promise.all(currenciesPromises);
 
     return currenciesCreated;
+  }
+
+  private async seedTransactions(accounts: Account[]) {
+    const transactionsToCreate = getTransactions(accounts);
+    const transactionsPromises = transactionsToCreate.map((t) =>
+      this.transactionService.createTransaction(t.transaction, t.user),
+    );
+    const transactions = await Promise.all(transactionsPromises);
+    return transactions;
   }
 }
