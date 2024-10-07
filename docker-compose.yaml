@@ -4,12 +4,11 @@ services:
   db:
     image: postgres:14.3
     ports:
-      - "5433:5432"
+      - "${PGPORT}:5432"
     environment:
       POSTGRES_PASSWORD: '${PGPASSWORD}'
+      POSTGRES_USER: ${PGUSER}
       POSTGRES_DB: '${PGDB}'
     container_name: finance-back
     volumes:
-      - psql:/var/lib/postgresql/data
-volumes:
-  psql:
+      - ./postgres:/var/lib/postgresql/data

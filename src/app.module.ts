@@ -35,6 +35,7 @@ import RequestLogMiddleware from './middlewares/requestLog.middleware';
           database: configService.get('PGDB'),
           autoLoadEntities: true,
           synchronize: true,
+          port: configService.get('PGPORT'),
         };
       },
     }),
