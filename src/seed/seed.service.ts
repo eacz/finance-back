@@ -42,15 +42,12 @@ export class SeedService {
     const currencies = await this.seedCurrencies();
     const accounts = await this.seedAccounts(users, currencies);
     const transactions = await this.seedTransactions(accounts);
-    console.log(transactions);
+
+    return {ok: true, message: 'Seed executed'}
   }
 
   private async seedUsers() {
-    const usersWithHashedPassword = users.map((user) => ({
-      ...user,
-      password: bcrypt.hashSync(user.password, 10),
-    }));
-    const usersPromises = usersWithHashedPassword.map((user) =>
+    const usersPromises = users.map((user) =>
       this.authService.create(user),
     );
     const createdUsers = await Promise.all(usersPromises);

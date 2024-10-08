@@ -43,7 +43,7 @@ export class AuthService {
       ],
     });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user && bcrypt.compareSync(password, user.password)) {
       const payload: JwtPayload = { username };
 
       const token = this.jwtService.sign(payload, {
