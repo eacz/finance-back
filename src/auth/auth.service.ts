@@ -44,12 +44,15 @@ export class AuthService {
     });
 
     if (user && bcrypt.compareSync(password, user.password)) {
-      const payload: JwtPayload = { username };
+      const payload: JwtPayload = { username: user.username };
 
       const token = this.jwtService.sign(payload, {
         expiresIn: this.configService.get('JWT_EXPIRES_IN') || 3600,
       });
       delete user.password;
+      console.log(loginDTO);
+      console.log(token);
+      
       return { token, user: { ...user } };
     } else {
       throw new UnauthorizedException('Invalid credentials');
