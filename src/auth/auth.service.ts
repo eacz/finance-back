@@ -50,8 +50,6 @@ export class AuthService {
         expiresIn: this.configService.get('JWT_EXPIRES_IN') || 3600,
       });
       delete user.password;
-      console.log(loginDTO);
-      console.log(token);
       
       return { token, user: { ...user } };
     } else {
