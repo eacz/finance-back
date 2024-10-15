@@ -80,13 +80,15 @@ export class TransactionService {
     const limit = paginationDto.limit || 100;
     const offset = paginationDto.offset || 0;
 
-    const transactions = this.transactionRepository
+    const transactions = await this.transactionRepository
       .createQueryBuilder('transaction')
       .where('user_id = :userId', { userId: user.id })
       .andWhere('account_id = :accountId', { accountId })
       .skip(offset)
       .take(limit)
-      .orderBy('id', 'ASC');
+      .orderBy('id', 'ASC')
+      .getMany();
+
     return transactions;
   }
 
