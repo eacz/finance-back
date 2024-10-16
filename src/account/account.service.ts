@@ -49,6 +49,7 @@ export class AccountService {
     const accounts = await this.accountRepository.find({
       where: { user: { id: userId } },
       relations: ['currency'],
+      order: { createdAt: { direction: 'DESC' } },
     });
 
     return accounts;

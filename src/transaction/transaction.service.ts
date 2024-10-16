@@ -64,7 +64,7 @@ export class TransactionService {
     const transactions = await this.transactionRepository.find({
       where: { user: { id: user.id } },
       relations: ['currency'],
-      order: { id: { direction: 'ASC' } },
+      order: { createdAt: { direction: 'DESC' } },
       skip: offset,
       take: limit,
     });
@@ -86,7 +86,7 @@ export class TransactionService {
       .andWhere('account_id = :accountId', { accountId })
       .skip(offset)
       .take(limit)
-      .orderBy('id', 'ASC')
+      .orderBy('transaction.createdAt', 'DESC')
       .getMany();
 
     return transactions;

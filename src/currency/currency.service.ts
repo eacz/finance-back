@@ -34,6 +34,7 @@ export class CurrencyService {
   async getCurrencies(): Promise<getCurrenciesResponse[]> {
     const currencies = await this.currencyRepository.find({
       select: ['code', 'id', 'name'],
+      order: { createdAt: 'DESC' },
     });
 
     return currencies;
