@@ -93,7 +93,13 @@ export class TransactionService {
       .orderBy('transaction.createdAt', 'DESC')
       .getMany();
 
-    return transactions;
+    const total = await this.transactionRepository
+      .createQueryBuilder('transaction')
+      .where('user_id = :userId', { userId: user.id })
+      .andWhere('account_id = :accountId', { accountId })
+      .getCount();
+
+    return { transactions, total: total };
   }
 
   async revertTransaction(user: User, id: number) {
