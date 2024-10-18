@@ -58,7 +58,7 @@ export class TransactionService {
   }
 
   async getTransactionByUser(paginationDto: PaginationDto, user: User) {
-    const limit = paginationDto.limit || 100;
+    const limit = paginationDto.limit || 10;
     const offset = paginationDto.offset || 0;
 
     const transactions = await this.transactionRepository.find({
@@ -69,7 +69,11 @@ export class TransactionService {
       take: limit,
     });
 
-    return transactions;
+    const total = await this.transactionRepository.count({
+      where: { user: { id: user.id } },
+    });
+
+    return { transactions, total };
   }
 
   async getTransactionByAccount(
