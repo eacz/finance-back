@@ -31,7 +31,7 @@ export class TransactionController {
     );
   }
 
-  @Patch('/:id')
+  @Patch('/revert/:id')
   @Auth()
   revertTransaction(
     @Param('id', ParseIntPipe) id: number,

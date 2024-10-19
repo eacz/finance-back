@@ -105,14 +105,21 @@ export class TransactionService {
   async revertTransaction(user: User, id: number) {
     const transaction = await this.transactionRepository.findOne({
       where: { user: { id: user.id }, id },
+      relations: ['account'],
     });
 
     if (!transaction) {
       throw new NotFoundException(`There is no transaction with id ${id}`);
     }
 
+    //TODO: fix this workaround till i fix type issues
+    const account: any = transaction.account;
+
     const revertedTransaction: Transaction = {
       ...transaction,
+      account: account.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       type: TransactionType[OpositeType[transaction.type]],
       title: `Operation reversed Nro #${transaction.id} - ${transaction.title}`,
     };
