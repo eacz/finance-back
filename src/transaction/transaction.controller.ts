@@ -14,6 +14,7 @@ import { getUser } from 'src/auth/decorators/get-user.decorator';
 import { User } from 'src/auth/entities/user.entity';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ModifyTransactionDto } from './dto/modifyTransaction.dto';
 
 @Controller('transaction')
 export class TransactionController {
@@ -27,6 +28,20 @@ export class TransactionController {
   ) {
     return this.transactionService.createTransaction(
       createTransactionDto,
+      user,
+    );
+  }
+
+  @Patch(':id')
+  @Auth()
+  modifyTransaction(
+    @Body() modifyTransactionDto: ModifyTransactionDto,
+    @Param('id', ParseIntPipe) id: number,
+    @getUser() user: User,
+  ) {
+    return this.transactionService.modifyTransaction(
+      id,
+      modifyTransactionDto,
       user,
     );
   }

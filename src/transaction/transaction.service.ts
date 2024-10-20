@@ -10,6 +10,7 @@ import {
 import { Repository } from 'typeorm';
 import { AccountService } from '../account/account.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ModifyTransactionDto } from './dto/modifyTransaction.dto';
 
 @Injectable()
 export class TransactionService {
@@ -100,6 +101,34 @@ export class TransactionService {
       .getCount();
 
     return { transactions, total: total };
+  }
+
+  async modifyTransaction(
+    id: number,
+    modifyTransactionDto: ModifyTransactionDto,
+    user: User,
+  ) {
+    const transaction = await this.transactionRepository.findOne({
+      where: { user: { id: user.id }, id },
+      relations: ['account'],
+    });
+
+    if (!transaction) {
+      throw new NotFoundException(`There is no transaction with id ${id}`);
+    }
+
+    const { title, description } = modifyTransactionDto;
+
+    const toUpdate = {
+      description: description ?? transaction.description,
+      title: title ?? transaction.title,
+    };
+
+    const res = await this.transactionRepository.update({ id }, toUpdate);
+    if (res.affected === 0) {
+      return { ok: false };
+    }
+    return { ok: true };
   }
 
   async revertTransaction(user: User, id: number) {
