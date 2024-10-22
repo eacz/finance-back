@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { AccountService } from '../account/account.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ModifyTransactionDto } from './dto/modifyTransaction.dto';
+import { GetTransactionsDto } from './dto/getTransactions.dto';
 
 @Injectable()
 export class TransactionService {
@@ -58,21 +59,50 @@ export class TransactionService {
     return transaction;
   }
 
-  async getTransactionByUser(paginationDto: PaginationDto, user: User) {
-    const limit = paginationDto.limit || 10;
-    const offset = paginationDto.offset || 0;
+  async getTransactionByUser(
+    getTransactionsDto: GetTransactionsDto,
+    user: User,
+  ) {
+    const limit = getTransactionsDto.limit || 10;
+    const offset = getTransactionsDto.offset || 0;
 
-    const transactions = await this.transactionRepository.find({
-      where: { user: { id: user.id } },
-      relations: ['currency'],
-      order: { createdAt: { direction: 'DESC' } },
-      skip: offset,
-      take: limit,
-    });
+    const transactionsQuery = this.transactionRepository
+      .createQueryBuilder('transaction')
+      .where('user_id = :userId', { userId: user.id })
+      .innerJoinAndSelect(
+        'currency',
+        'currency',
+        'transaction.currency_id = currency.id',
+      )
+      .offset(offset)
+      .limit(limit)
+      .orderBy('transaction.createdAt', 'DESC');
 
-    const total = await this.transactionRepository.count({
-      where: { user: { id: user.id } },
-    });
+    const totalQuery = this.transactionRepository
+      .createQueryBuilder('transaction')
+      .where('user_id = :userId', { userId: user.id });
+
+    if (getTransactionsDto.account) {
+      transactionsQuery.andWhere('account_id = :accountId', {
+        accountId: getTransactionsDto.account,
+      });
+      totalQuery.andWhere('account_id = :accountId', {
+        accountId: getTransactionsDto.account,
+      });
+    }
+
+    if (getTransactionsDto.textFilter) {
+      transactionsQuery.andWhere('title like :text', {
+        text: `%${getTransactionsDto.textFilter}%`,
+      });
+      totalQuery.andWhere('title like :text', {
+        text: `%${getTransactionsDto.textFilter}%`,
+      });
+    }
+
+    const transactionsRaw = await transactionsQuery.getRawMany();
+    const transactions = this.buildTransactionWithCurrency(transactionsRaw);
+    const total = await totalQuery.getCount();
 
     return { transactions, total };
   }
@@ -155,5 +185,21 @@ export class TransactionService {
     delete revertedTransaction.id;
 
     return await this.createTransaction(revertedTransaction, user);
+  }
+
+  private buildTransactionWithCurrency(transactions: any[]) {
+    return transactions.map((transaction) => {
+      const obj = {};
+      Object.keys(transaction).map((key) => {
+        if (key.includes('transaction')) {
+          const newKey = key.split('transaction_').at(1);
+          obj[newKey] = transaction[key];
+        } else if (key.includes('currency')) {
+          const newKey = key.split('currency_').at(1);
+          obj['currency'] = { ...obj['currency'], [newKey]: transaction[key] };
+        }
+      });
+      return obj;
+    });
   }
 }
