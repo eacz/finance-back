@@ -92,10 +92,10 @@ export class TransactionService {
     }
 
     if (getTransactionsDto.textFilter) {
-      transactionsQuery.andWhere('title like :text', {
+      transactionsQuery.andWhere('LOWER(title) like LOWER(:text)', {
         text: `%${getTransactionsDto.textFilter}%`,
       });
-      totalQuery.andWhere('title like :text', {
+      totalQuery.andWhere('LOWER(title) like LOWER(:text)', {
         text: `%${getTransactionsDto.textFilter}%`,
       });
     }
