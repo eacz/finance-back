@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -11,6 +13,7 @@ import {
 import { Account } from 'src/account/entities/account.entity';
 import { Currency } from 'src/currency/entities/currency.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 export enum TransactionType {
   INCOME = 'INCOME',
@@ -59,6 +62,10 @@ export class Transaction {
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToMany(() => Category)
+  @JoinTable()
+  categories: Category[]
 
   @CreateDateColumn({
     type: 'timestamp',

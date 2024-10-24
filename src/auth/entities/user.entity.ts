@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 
 import { Account } from 'src/account/entities/account.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 @Entity({ name: 'user' })
 export class User {
@@ -40,6 +41,12 @@ export class User {
     cascade: true,
   })
   accounts: Account[];
+
+  @OneToMany(() => Category, (category) => category.user, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  categories: Account[];
 
   @CreateDateColumn({
     type: 'timestamp',
