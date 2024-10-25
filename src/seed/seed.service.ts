@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 
 import { AuthService } from 'src/auth/auth.service';
@@ -17,6 +16,9 @@ import { UserAuth } from 'src/auth/interfaces/authResponse';
 import { Currency } from 'src/currency/entities/currency.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { Account } from 'src/account/entities/account.entity';
+import { Category } from 'src/category/entities/category.entity';
+import { categories, getCategories } from './data/categories';
+import { CategoryService } from 'src/category/category.service';
 
 @Injectable()
 export class SeedService {
@@ -27,29 +29,32 @@ export class SeedService {
     private readonly currencyRepository: Repository<Currency>,
     @InjectRepository(Account)
     private readonly accountRepository: Repository<Account>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
     private readonly authService: AuthService,
     private readonly accountService: AccountService,
     private readonly currencyService: CurrencyService,
     private readonly transactionService: TransactionService,
+    private readonly categoryService: CategoryService,
   ) {}
 
   async generateSeed() {
     await this.accountRepository.delete({});
     await this.currencyRepository.delete({});
     await this.userRepository.delete({});
+    await this.categoryRepository.delete({});
 
     const users = await this.seedUsers();
     const currencies = await this.seedCurrencies();
     const accounts = await this.seedAccounts(users, currencies);
     const transactions = await this.seedTransactions(accounts);
+    const categories = await this.seedCategories(users as any);
 
-    return {ok: true, message: 'Seed executed'}
+    return { ok: true, message: 'Seed executed' };
   }
 
   private async seedUsers() {
-    const usersPromises = users.map((user) =>
-      this.authService.create(user),
-    );
+    const usersPromises = users.map((user) => this.authService.create(user));
     const createdUsers = await Promise.all(usersPromises);
 
     return createdUsers.map((u) => u.user);
@@ -89,5 +94,15 @@ export class SeedService {
     );
     const transactions = await Promise.all(transactionsPromises);
     return transactions;
+  }
+
+  private async seedCategories(users: User[]) {
+    const categoriesToCreate = getCategories(users);
+    const categoriesPromises = categoriesToCreate.map((c) => {
+      const { user, ...dto } = c;
+      return this.categoryService.create(dto, user);
+    });
+    const categories = await Promise.all(categoriesPromises);
+    return categories;
   }
 }

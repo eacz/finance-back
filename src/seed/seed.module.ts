@@ -12,6 +12,7 @@ import { TransactionModule } from 'src/transaction/transaction.module';
 import { Account } from 'src/account/entities/account.entity';
 import { Currency } from 'src/currency/entities/currency.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { CategoryModule } from 'src/category/category.module';
 
 
 @Module({
@@ -22,7 +23,8 @@ import { User } from 'src/auth/entities/user.entity';
     AuthModule,
     AccountModule,
     CurrencyModule,
-    TransactionModule
+    TransactionModule,
+    CategoryModule
   ],
 })
 export class SeedModule {}
