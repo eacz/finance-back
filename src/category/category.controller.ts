@@ -1,9 +1,14 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+
 import { CategoryService } from './category.service';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import { getUser } from 'src/auth/decorators/get-user.decorator';
+
 import { User } from 'src/auth/entities/user.entity';
+
+import { getUser } from 'src/auth/decorators/get-user.decorator';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -16,5 +21,14 @@ export class CategoryController {
     @getUser() user: User,
   ) {
     return this.categoryService.create(createCategoryDto, user);
+  }
+
+  @Get('')
+  @Auth()
+  getCategoriesByUser(
+    @Query() paginationDto: PaginationDto,
+    @getUser() user: User,
+  ) {
+    return this.categoryService.getCategoriesByUser(paginationDto, user);
   }
 }

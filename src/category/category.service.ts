@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
-import { CreateCategoryDto } from './dto/create-category.dto';
+
+import { Category } from './entities/category.entity';
 import { User } from 'src/auth/entities/user.entity';
+
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class CategoryService {
@@ -21,5 +24,19 @@ export class CategoryService {
     await this.categoryRepository.save(category);
 
     return category;
+  }
+
+  async getCategoriesByUser(paginationDto: PaginationDto, user: User) {
+    const { limit = 100, offset = 0 } = paginationDto;
+
+    const categories = this.categoryRepository.find({
+      where: {
+        user: { id: user.id },
+      },
+      take: limit,
+      skip: offset,
+    });
+
+    return categories;
   }
 }
