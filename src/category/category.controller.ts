@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Query } from '@nestjs/common';
 
 import { CategoryService } from './category.service';
 
@@ -30,5 +30,14 @@ export class CategoryController {
     @getUser() user: User,
   ) {
     return this.categoryService.getCategoriesByUser(paginationDto, user);
+  }
+
+  @Get(':id')
+  @Auth()
+  getCategoriesById(
+    @Param('id', ParseIntPipe) id: number,
+    @getUser() user: User,
+  ) {
+    return this.categoryService.getCategoryById(id, user);
   }
 }
