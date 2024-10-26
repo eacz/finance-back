@@ -63,9 +63,9 @@ export class Transaction {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToMany(() => Category)
+  @ManyToOne(() => Category)
   @JoinTable()
-  categories: Category[]
+  category: Category
 
   @CreateDateColumn({
     type: 'timestamp',

@@ -17,7 +17,7 @@ import { Currency } from 'src/currency/entities/currency.entity';
 import { User } from 'src/auth/entities/user.entity';
 import { Account } from 'src/account/entities/account.entity';
 import { Category } from 'src/category/entities/category.entity';
-import { categories, getCategories } from './data/categories';
+import { getCategories } from './data/categories';
 import { CategoryService } from 'src/category/category.service';
 
 @Injectable()

@@ -27,4 +27,8 @@ export class CreateTransactionDto {
   @IsInt()
   @Min(1)
   account: number;
+
+  @IsOptional()
+  @IsInt() 
+  categoryId?: number
 }

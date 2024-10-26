@@ -12,6 +12,7 @@ import { AccountService } from '../account/account.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ModifyTransactionDto } from './dto/modifyTransaction.dto';
 import { GetTransactionsDto } from './dto/getTransactions.dto';
+import { CategoryService } from 'src/category/category.service';
 
 @Injectable()
 export class TransactionService {
@@ -19,10 +20,11 @@ export class TransactionService {
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
     private readonly accountService: AccountService,
+    private readonly categoryService: CategoryService,
   ) {}
 
   async createTransaction(
-    createTransactionDto: CreateTransactionDto | Transaction,
+    createTransactionDto: CreateTransactionDto,
     user: User,
   ) {
     const account = await this.accountService.updateAccountFunds(
@@ -40,6 +42,13 @@ export class TransactionService {
       account: account.id,
       user: user,
     });
+    if (createTransactionDto.categoryId) {
+      const category = await this.categoryService.getCategoryById(
+        createTransactionDto.categoryId,
+        user,
+      );
+      transaction.category = category;
+    }
     await this.transactionRepository.save(transaction, {});
     return transaction;
   }
