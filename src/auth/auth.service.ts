@@ -50,7 +50,7 @@ export class AuthService {
         expiresIn: this.configService.get('JWT_EXPIRES_IN') || 3600,
       });
       delete user.password;
-      
+
       return { token, user: { ...user } };
     } else {
       throw new UnauthorizedException('Invalid credentials');
@@ -91,7 +91,10 @@ export class AuthService {
         where: { username: payload.username },
       });
       delete user.password;
-      const newToken = this.jwtService.sign({ username: payload.username });
+      const newToken = this.jwtService.sign(
+        { username: payload.username },
+        { expiresIn: this.configService.get('JWT_EXPIRES_IN') || 3600 },
+      );
       return { token: newToken, user };
     } catch (error) {
       throw new BadRequestException('Invalid token');

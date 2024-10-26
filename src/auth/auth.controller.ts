@@ -1,12 +1,9 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 
 import { AuthService } from './auth.service';
-import { getUser } from './decorators/get-user.decorator';
-import { User } from './entities/user.entity';
-import { Auth } from './decorators/auth.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -22,9 +19,9 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
-  @Get('test')
-  @Auth()
-  test(@getUser() user: User) {
-    return user;
-  }
+   //TODO: change token obtention from body to headers xd
+   @Post('/renew-token')
+   renewToken(@Body('token') token: string): Promise<{ token: string }> {
+     return this.authService.renewToken(token)
+   }
 }
