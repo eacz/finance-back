@@ -1,5 +1,6 @@
 import { User } from 'src/auth/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Transaction } from 'src/transaction/entities/transaction.entity';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'category' })
 export class Category {
@@ -17,4 +18,7 @@ export class Category {
     onDelete: 'CASCADE',
   })
   user: User;
+
+  @OneToMany(() => Transaction, (transaction) => transaction.category)
+  transactions: Transaction[]
 }

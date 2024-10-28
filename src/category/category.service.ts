@@ -7,6 +7,7 @@ import { User } from 'src/auth/entities/user.entity';
 
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { GetCategoriesDto } from './dto/get-categories.dto';
 
 @Injectable()
 export class CategoryService {
@@ -26,16 +27,28 @@ export class CategoryService {
     return category;
   }
 
-  async getCategoriesByUser(paginationDto: PaginationDto, user: User) {
-    const { limit = 100, offset = 0 } = paginationDto;
+  async getCategoriesByUser(getCategoriesDto: GetCategoriesDto, user: User) {
+    const {
+      limit = 100,
+      offset = 0,
+      showTransactionsAmount,
+    } = getCategoriesDto;
 
-    const categories = this.categoryRepository.find({
-      where: {
-        user: { id: user.id },
-      },
-      take: limit,
-      skip: offset,
-    });
+    const categoriesQuery = this.categoryRepository
+      .createQueryBuilder('category')
+      .where('category.userId = :user', { user: user.id })
+      .limit(limit)
+      .offset(offset);
+
+    if (showTransactionsAmount) {
+      categoriesQuery.loadRelationCountAndMap(
+        'category.transactionsAmount',
+        'category.transactions',
+        'transaction',
+      );
+    }
+
+    const categories = await categoriesQuery.getMany();
 
     return categories;
   }
