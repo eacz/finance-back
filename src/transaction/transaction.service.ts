@@ -109,6 +109,15 @@ export class TransactionService {
       });
     }
 
+    if (getTransactionsDto.category) {
+      transactionsQuery.andWhere('category_id = :category', {
+        category: getTransactionsDto.category,
+      });
+      totalQuery.andWhere('category_id = :category', {
+        category: getTransactionsDto.category,
+      });
+    }
+
     const transactionsRaw = await transactionsQuery.getRawMany();
     const transactions = this.buildTransactionWithCurrency(transactionsRaw);
     const total = await totalQuery.getCount();

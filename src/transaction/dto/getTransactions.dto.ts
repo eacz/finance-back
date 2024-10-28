@@ -8,6 +8,11 @@ export class GetTransactionsDto extends PaginationDto {
   account?: number;
 
   @IsOptional()
+  @IsInt()
+  @Min(0)
+  category?: number;
+
+  @IsOptional()
   @IsString()
   textFilter?: string;
 }
