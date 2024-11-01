@@ -56,7 +56,13 @@ export class TransactionService {
   async getTransactionById(id: number, user: User) {
     const transaction = await this.transactionRepository.findOne({
       where: { id, user: { id: user.id } },
-      relations: ['account', 'currency', 'user'],
+      relations: ['account', 'currency', 'user', 'category'],
+      select: {
+        category: {
+          id: true,
+          name: true,
+        },
+      },
     });
 
     if (!transaction) {
@@ -172,7 +178,17 @@ export class TransactionService {
       title: title ?? transaction.title,
     };
 
-    const res = await this.transactionRepository.update({ id }, toUpdate);
+    let categoryToUpdate = null
+
+    if (modifyTransactionDto.category) {
+      const category = await this.categoryService.getCategoryById(
+        modifyTransactionDto.category,
+        user,
+      );
+      categoryToUpdate = category;
+    }
+
+    const res = await this.transactionRepository.update({ id }, {...toUpdate, category: categoryToUpdate});
     if (res.affected === 0) {
       return { ok: false };
     }
