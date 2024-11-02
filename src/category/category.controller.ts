@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 
@@ -16,8 +17,8 @@ import { getUser } from 'src/auth/decorators/get-user.decorator';
 import { Auth } from 'src/auth/decorators/auth.decorator';
 
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { GetCategoriesDto } from './dto/get-categories.dto';
+import { ModifyCategoryDto } from './dto/modify-category.dto';
 
 @Controller('category')
 export class CategoryController {
@@ -48,5 +49,15 @@ export class CategoryController {
     @getUser() user: User,
   ) {
     return this.categoryService.getCategoryById(id, user);
+  }
+
+  @Put(':id')
+  @Auth()
+  modifyCategory(
+    @Param('id', ParseIntPipe) id: number,
+    @getUser() user: User,
+    @Body() modifyCategoryDto: ModifyCategoryDto,
+  ) {
+    return this.categoryService.modifyCategory(id, modifyCategoryDto, user);
   }
 }

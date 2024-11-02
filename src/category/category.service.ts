@@ -8,6 +8,7 @@ import { User } from 'src/auth/entities/user.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { GetCategoriesDto } from './dto/get-categories.dto';
+import { ModifyCategoryDto } from './dto/modify-category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -62,6 +63,22 @@ export class CategoryService {
       throw new NotFoundException(`There is no category with id ${id}`);
     }
 
+    return category;
+  }
+
+  async modifyCategory(
+    id: number,
+    modifyCategoryDto: ModifyCategoryDto,
+    user: User,
+  ) {
+    let category = await this.categoryRepository.findOne({
+      where: { id, user: { id: user.id } },
+    });
+    if (!category) {
+      throw new NotFoundException(`There is no category with id ${id}`);
+    }
+    category = { ...category, ...modifyCategoryDto };
+    await this.categoryRepository.save(category);
     return category;
   }
 }
