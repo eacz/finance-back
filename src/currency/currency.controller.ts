@@ -12,18 +12,18 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { CreateCurrencyDto } from './dto/createCurrency.dto';
 import { getUser } from 'src/auth/decorators/get-user.decorator';
 import { UpdateCurrencyDto } from './dto/updateCurrency.dto';
+import { validRoles } from 'src/auth/interfaces/valid-roles';
 
 @Controller('currency')
 export class CurrencyController {
   constructor(private readonly currencyService: CurrencyService) {}
 
   @Post('')
-  @Auth()
+  @Auth(validRoles.admin)
   create(
     @Body() createCurrencyDto: CreateCurrencyDto,
-    @getUser('id') userId: number,
   ) {
-    return this.currencyService.create(createCurrencyDto, userId);
+    return this.currencyService.create(createCurrencyDto);
   }
 
   @Get('/all')

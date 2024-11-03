@@ -18,10 +18,7 @@ export class CurrencyService {
     private currencyRepository: Repository<Currency>,
   ) {}
 
-  async create(createCurrencyDto: CreateCurrencyDto, userId: number) {
-    //until I create roles auth system
-    if (userId !== 1) throw new UnauthorizedException();
-
+  async create(createCurrencyDto: CreateCurrencyDto) {
     try {
       const currency = this.currencyRepository.create(createCurrencyDto);
       await this.currencyRepository.save(currency);
