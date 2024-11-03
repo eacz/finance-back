@@ -36,6 +36,9 @@ export class User {
   @Column()
   country: string;
 
+  @Column('text', { array: true, default: ['user'] })
+  roles: string[];
+
   @OneToMany(() => Account, (account) => account.user, {
     onDelete: 'CASCADE',
     cascade: true,
