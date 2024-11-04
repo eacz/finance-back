@@ -79,7 +79,7 @@ export class SeedService {
 
   private async seedCurrencies() {
     const currenciesPromises = currencies.map((currency) =>
-      this.currencyService.create(currency, 1),
+      this.currencyService.create(currency),
     );
 
     const currenciesCreated = await Promise.all(currenciesPromises);
