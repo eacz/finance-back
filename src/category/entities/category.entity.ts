@@ -1,6 +1,12 @@
 import { User } from 'src/auth/entities/user.entity';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'category' })
 export class Category {
@@ -13,6 +19,9 @@ export class Category {
   @Column({ nullable: true })
   description: string;
 
+  @Column({ default: 'other' })
+  icon: string;
+
   @ManyToOne(() => User, (user) => user.categories, {
     eager: false,
     onDelete: 'CASCADE',
@@ -20,5 +29,5 @@ export class Category {
   user: User;
 
   @OneToMany(() => Transaction, (transaction) => transaction.category)
-  transactions: Transaction[]
+  transactions: Transaction[];
 }
