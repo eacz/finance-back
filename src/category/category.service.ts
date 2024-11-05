@@ -18,8 +18,9 @@ export class CategoryService {
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto, user: User) {
-    const category = await this.categoryRepository.create({
+    const category = this.categoryRepository.create({
       ...createCategoryDto,
+      icon: createCategoryDto.icon ?? 'other',
       user: user,
     });
 

@@ -10,9 +10,9 @@ export const getCategories = (user: User[]) => {
 };
 
 export const categories = [
-  { name: 'Clothes', description: '' },
-  { name: 'Food', description: '' },
-  { name: 'Supermarket', description: '' },
-  { name: 'Home', description: '' },
-  { name: 'Services', description: '' },
+  { name: 'Clothes', description: '', icon: 'shirt' },
+  { name: 'Food', description: '', icon: 'food' },
+  { name: 'Supermarket', description: '', icon: 'store' },
+  { name: 'Home', description: '', icon: 'home' },
+  { name: 'Services', description: '', icon: 'hammer' },
 ];
