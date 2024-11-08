@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/createTransaction.dto';
 import { User } from 'src/auth/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -171,6 +171,10 @@ export class TransactionService {
       throw new NotFoundException(`There is no transaction with id ${id}`);
     }
 
+    if(!transaction.isEditable) {
+      throw new ForbiddenException(`This transactions can't be modified`)
+    }
+
     const { title, description } = modifyTransactionDto;
 
     const toUpdate = {
@@ -215,6 +219,7 @@ export class TransactionService {
       updatedAt: new Date(),
       type: TransactionType[OpositeType[transaction.type]],
       title: `Operation reversed Nro #${transaction.id} - ${transaction.title}`,
+      isEditable: false
     };
     delete revertedTransaction.id;
 

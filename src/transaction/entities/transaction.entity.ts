@@ -42,6 +42,9 @@ export class Transaction {
   @Column('float')
   amount: number;
 
+  @Column('boolean', { default: true })
+  isEditable: boolean;
+
   @ManyToOne(() => Account, {
     onDelete: 'CASCADE',
     cascade: true,
