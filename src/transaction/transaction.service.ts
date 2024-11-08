@@ -212,6 +212,9 @@ export class TransactionService {
     //TODO: fix this workaround till i fix type issues
     const account: any = transaction.account;
 
+    transaction.isEditable = false 
+    await this.transactionRepository.save(transaction)
+
     const revertedTransaction: Transaction = {
       ...transaction,
       account: account.id,
