@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateTransactionDto } from './dto/createTransaction.dto';
 import { User } from 'src/auth/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +17,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ModifyTransactionDto } from './dto/modifyTransaction.dto';
 import { GetTransactionsDto } from './dto/getTransactions.dto';
 import { CategoryService } from 'src/category/category.service';
+import { GetTransactionsReportDto } from './dto/getTransactionsReport.dto';
 
 @Injectable()
 export class TransactionService {
@@ -72,6 +77,45 @@ export class TransactionService {
     delete transaction.user;
 
     return transaction;
+  }
+
+  async getTransactionsReport(
+    getTransactionsReportDto: GetTransactionsReportDto,
+    user: User,
+  ) {
+    const transactionsQuery = this.transactionRepository
+      .createQueryBuilder('transaction')
+      .where('user_id = :userId', { userId: user.id })
+      .orderBy('transaction.createdAt', 'DESC')
+      //this doesn't work
+      //.groupBy('transaction_category_id')
+
+      .innerJoinAndSelect(
+        'currency',
+        'currency',
+        'transaction.currency_id = currency.id',
+      )
+      .leftJoinAndSelect(
+        'category',
+        'category',
+        'transaction.category_id = category.id',
+      );
+
+    if (getTransactionsReportDto.account) {
+      transactionsQuery.andWhere('account_id = :accountId', {
+        accountId: getTransactionsReportDto.account,
+      });
+    }
+
+    if (getTransactionsReportDto.textFilter) {
+      transactionsQuery.andWhere('LOWER(title) like LOWER(:text)', {
+        text: `%${getTransactionsReportDto.textFilter}%`,
+      });
+    }
+
+    const result = await transactionsQuery.getRawMany();
+    const report = this.buildReport(result);
+    return { total: result.length, report };
   }
 
   async getTransactionByUser(
@@ -171,8 +215,8 @@ export class TransactionService {
       throw new NotFoundException(`There is no transaction with id ${id}`);
     }
 
-    if(!transaction.isEditable) {
-      throw new ForbiddenException(`This transactions can't be modified`)
+    if (!transaction.isEditable) {
+      throw new ForbiddenException(`This transactions can't be modified`);
     }
 
     const { title, description } = modifyTransactionDto;
@@ -182,7 +226,7 @@ export class TransactionService {
       title: title ?? transaction.title,
     };
 
-    let categoryToUpdate = null
+    let categoryToUpdate = null;
 
     if (modifyTransactionDto.category) {
       const category = await this.categoryService.getCategoryById(
@@ -192,7 +236,10 @@ export class TransactionService {
       categoryToUpdate = category;
     }
 
-    const res = await this.transactionRepository.update({ id }, {...toUpdate, category: categoryToUpdate});
+    const res = await this.transactionRepository.update(
+      { id },
+      { ...toUpdate, category: categoryToUpdate },
+    );
     if (res.affected === 0) {
       return { ok: false };
     }
@@ -212,8 +259,8 @@ export class TransactionService {
     //TODO: fix this workaround till i fix type issues
     const account: any = transaction.account;
 
-    transaction.isEditable = false 
-    await this.transactionRepository.save(transaction)
+    transaction.isEditable = false;
+    await this.transactionRepository.save(transaction);
 
     const revertedTransaction: Transaction = {
       ...transaction,
@@ -222,7 +269,7 @@ export class TransactionService {
       updatedAt: new Date(),
       type: TransactionType[OpositeType[transaction.type]],
       title: `Operation reversed Nro #${transaction.id} - ${transaction.title}`,
-      isEditable: false
+      isEditable: false,
     };
     delete revertedTransaction.id;
 
@@ -243,5 +290,33 @@ export class TransactionService {
       });
       return obj;
     });
+  }
+
+  private buildReport(transactions: any[]) {
+    const transactionsWithCategory = transactions.map((t) =>
+      t.transaction_category_id ? t : { ...t, transaction_category_id: 'none' },
+    );
+
+    const transactionsByCategory = transactionsWithCategory.reduce(
+      (prev, transaction) => {
+        if (transaction.transaction_category_id) {
+          if (prev[transaction.transaction_category_id]) {
+            prev[transaction.transaction_category_id] = [
+              ...prev[transaction.transaction_category_id],
+              transaction,
+            ];
+          } else {
+            prev = {
+              ...prev,
+              [transaction.transaction_category_id]: [transaction],
+            };
+          }
+        }
+        return prev;
+      },
+      {},
+    );
+
+    return transactionsByCategory;
   }
 }

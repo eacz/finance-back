@@ -16,6 +16,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ModifyTransactionDto } from './dto/modifyTransaction.dto';
 import { GetTransactionsDto } from './dto/getTransactions.dto';
+import { GetTransactionsReportDto } from './dto/getTransactionsReport.dto';
 
 @Controller('transaction')
 export class TransactionController {
@@ -62,7 +63,10 @@ export class TransactionController {
     @Query() getTransactionsDto: GetTransactionsDto,
     @getUser() user: User,
   ) {
-    return this.transactionService.getTransactionByUser(getTransactionsDto, user);
+    return this.transactionService.getTransactionByUser(
+      getTransactionsDto,
+      user,
+    );
   }
 
   @Get('/by-account/:accountId')
@@ -76,6 +80,18 @@ export class TransactionController {
       paginationDto,
       user,
       accountId,
+    );
+  }
+
+  @Get('/report')
+  @Auth()
+  getTransactionsReport(
+    @getUser() user: User,
+    @Query() getTransactionsReportDto: GetTransactionsReportDto,
+  ) {
+    return this.transactionService.getTransactionsReport(
+      getTransactionsReportDto,
+      user,
     );
   }
 
